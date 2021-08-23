@@ -1,0 +1,53 @@
+version: "3"
+
+services:
+  nextcloud:
+    image: nextcloud:latest
+    container_name: nextcloud
+    restart: unless-stopped
+    depends_on:
+      - ncdb
+    ports:
+      - 80:80
+    environment:
+      - MYSQL_HOST=192.168.199.60
+      - MYSQL_DATABASE=nextcloud
+      - MYSQL_USER=nextcloud
+      - MYSQL_PASSWORD=nextcloud
+      - MYSQL_ROOT_PASSWORD=nextcloud
+    volumes:
+      - nextcloud:/var/www/html
+
+  ncdb:
+    image: mariadb
+    container_name: db
+    #command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
+    command: --innodb-read-only-compressed=OFF
+    restart: unless-stopped
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_HOST=192.168.199.60
+      - MYSQL_DATABASE=nextcloud
+      - MYSQL_USER=nextcloud
+      - MYSQL_PASSWORD=nextcloud
+      - MYSQL_ROOT_PASSWORD=nextcloud
+    volumes:
+      - mysql:/var/lib/mysql
+  portainer:
+    image: portainer/portainer
+    container_name: portainer
+    restart: always
+    ports:
+      - 9000:9000
+    volumes:
+      - data:/data
+      - docker:/var/run/docker.sock
+
+
+volumes:
+  mysql:
+  nextcloud:
+  collabora:
+  data:
+  docker:
